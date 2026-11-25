@@ -18,6 +18,9 @@ const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME || "ems_token";
 
 const app = express();
 
+// Trust Render's reverse proxy so req.protocol reflects HTTPS
+app.set("trust proxy", 1);
+
 // Set view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -131,6 +134,11 @@ app.use(async (req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.path = req.path.replace(/\/$/, "") || "/";
   next();
+});
+
+// Health check endpoint for Render
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
 });
 
 // Routes
